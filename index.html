@@ -82,6 +82,9 @@
   .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
   .rv.in{opacity:1;transform:none}
 
+  /* 区块级转场:JS 把每个 section 的内容包进 .sec-inner,离场时整体位移/淡出 */
+  .sec-inner{will-change:transform,opacity}
+
   /* kinetic title: per-line mask (JS 把 h1/h2 按 <br> 拆行后套用) */
   .line{display:block;overflow:hidden;padding-bottom:.09em;margin-bottom:-.09em}
   .line-i{display:block;will-change:transform}
@@ -426,6 +429,20 @@ if(MOTION){
     ScrollTrigger.create({trigger:el, start:'top 92%', once:true, onEnter:()=>countUp(el)}));
 }
 
+/* —— P2 · 区块级转场:离场区块整体上移/缩小/淡出(入场细节仍由逐行+stagger 负责)—— */
+if(MOTION){
+  secs.forEach(sec=>{                                   // 把内容包进 .sec-inner(不动 section 盒子)
+    const inner=document.createElement('div'); inner.className='sec-inner';
+    while(sec.firstChild) inner.appendChild(sec.firstChild);
+    sec.appendChild(inner);
+  });
+  secs.forEach(sec=>{
+    const inner=sec.querySelector('.sec-inner'); if(!inner) return;
+    gsap.fromTo(inner,{opacity:1, yPercent:0, scale:1},
+      {opacity:0.12, yPercent:-10, scale:0.975, ease:'none',
+       scrollTrigger:{trigger:sec, start:'top top', end:'bottom top', scrub:0.5}});
+  });
+}
 if(GS) ScrollTrigger.refresh();
 </script>
 
