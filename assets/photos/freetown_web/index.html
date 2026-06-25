@@ -26,6 +26,12 @@
   .brand{font-weight:700;letter-spacing:.28em;font-size:13px}
   .brand small{display:block;letter-spacing:.18em;color:var(--muted);font-weight:400;font-size:10px;margin-top:3px;mix-blend-mode:normal}
   .meta{font-size:11px;letter-spacing:.18em;color:var(--muted);text-align:right}
+  .topright{display:flex;align-items:center;gap:18px}
+  .lang{font-family:var(--sans);font-size:11px;letter-spacing:.18em;color:var(--ink);
+    background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:30px;
+    padding:6px 13px;cursor:pointer;mix-blend-mode:normal;transition:background .3s,border-color .3s}
+  .lang:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.32)}
+  body.lang-en h1 .en,body.lang-en h2 .en{display:none}
 
   /* split layout */
   /* WebGL hero 流体噪点背景层(降级时不创建,内容半透明叠在 body 底色上,观感不变) */
@@ -124,7 +130,10 @@
 <div class="progress" id="progress"></div>
 <div class="topbar">
   <div class="brand">FREETOWN<small>QUEEN ELIZABETH II QUAY · SIERRA LEONE</small></div>
-  <div class="meta">8°29′N&nbsp;&nbsp;13°12′W<br>UN/LOCODE · SLFNA</div>
+  <div class="topright">
+    <button class="lang" id="langtoggle" type="button" aria-label="Switch language / 切换语言">EN</button>
+    <div class="meta">8°29′N&nbsp;&nbsp;13°12′W<br>UN/LOCODE · SLFNA</div>
+  </div>
 </div>
 
 <div class="stage">
@@ -139,46 +148,46 @@
 
   <!-- RIGHT: scrolling content -->
   <div class="content">
-    <section class="hero" data-img="0" data-cap="港口 · 入港航道" data-idx="01 — GATEWAY">
-      <div class="num">塞拉利昂 · 国家门户</div>
-      <h1>弗里敦港<span class="en">The Port of Freetown</span></h1>
-      <p class="lead rv">西非海岸条件极佳的天然深水湾,塞拉利昂唯一的深水港——几乎承载着全国全部的进出口货流。</p>
+    <section class="hero" data-img="0" data-cap="港口 · 入港航道" data-cap-en="Harbour · approach channel" data-idx="01 — GATEWAY">
+      <div class="num" data-en="Sierra Leone · National Gateway">塞拉利昂 · 国家门户</div>
+      <h1 data-en="Port of Freetown">弗里敦港<span class="en">The Port of Freetown</span></h1>
+      <p class="lead rv" data-en="A superb natural deep-water bay on the West African coast — Sierra Leone's only deep-water port, carrying virtually all of the nation's imports and exports.">西非海岸条件极佳的天然深水湾,塞拉利昂唯一的深水港——几乎承载着全国全部的进出口货流。</p>
       <div class="scrollhint">SCROLL <span class="bar"></span></div>
     </section>
 
-    <section data-img="0" data-cap="港口 · 卡拉德尼兹电力船" data-idx="02 — HARBOUR">
-      <div class="num">01 <span>/ 概况</span></div>
-      <h2 class="rv">一国一港的<br>海上总门户<span class="en">A natural deep-water harbour</span></h2>
-      <p class="lead rv">核心区为伊丽莎白二世码头(QE II),岸线总长约 1,067 米,1960 年由英国女王剪彩启用。它的拥堵、潮汐窗口与清关效率,直接决定整个国家供应链的节奏。</p>
+    <section data-img="0" data-cap="港口 · 卡拉德尼兹电力船" data-cap-en="Harbour · Karpowership" data-idx="02 — HARBOUR">
+      <div class="num" data-en="01 <span>/ OVERVIEW</span>">01 <span>/ 概况</span></div>
+      <h2 class="rv" data-en="One nation,<br>one gateway port">一国一港的<br>海上总门户<span class="en">A natural deep-water harbour</span></h2>
+      <p class="lead rv" data-en="Its core is the Queen Elizabeth II Quay (QE II), about 1,067 m of berthing line, opened by the Queen in 1960. Its congestion, tidal windows and clearance speed set the rhythm of the whole national supply chain.">核心区为伊丽莎白二世码头(QE II),岸线总长约 1,067 米,1960 年由英国女王剪彩启用。它的拥堵、潮汐窗口与清关效率,直接决定整个国家供应链的节奏。</p>
       <div class="stat rv">
-        <div><div class="v">1,067m</div><div class="k">岸线总长</div></div>
-        <div><div class="v">~10m</div><div class="k">高潮水深</div></div>
-        <div><div class="v">6</div><div class="k">同时作业船数</div></div>
+        <div><div class="v">1,067m</div><div class="k" data-en="Quay length">岸线总长</div></div>
+        <div><div class="v">~10m</div><div class="k" data-en="Depth at high tide">高潮水深</div></div>
+        <div><div class="v">6</div><div class="k" data-en="Ships worked at once">同时作业船数</div></div>
       </div>
     </section>
 
-    <section data-img="2" data-cap="城市俯瞰 · Fourah Bay 方向" data-idx="03 — LANDLORD">
-      <div class="num">02 <span>/ 管理体制</span></div>
-      <h2 class="rv">"房东港"模式<br>三方各管一段<span class="en">Landlord port model</span></h2>
-      <p class="lead rv">港务局 SLPA 作为"房东"保留岸线与监管;集装箱由 Freetown Terminal(AGL)运营,散杂货由 Nectar 散货码头运营。</p>
+    <section data-img="2" data-cap="城市俯瞰 · Fourah Bay 方向" data-cap-en="City overlook · toward Fourah Bay" data-idx="03 — LANDLORD">
+      <div class="num" data-en="02 <span>/ GOVERNANCE</span>">02 <span>/ 管理体制</span></div>
+      <h2 class="rv" data-en="A landlord port,<br>run by three parties">"房东港"模式<br>三方各管一段<span class="en">Landlord port model</span></h2>
+      <p class="lead rv" data-en="The Ports Authority (SLPA) is the landlord, keeping the quays and oversight; containers are run by Freetown Terminal (AGL), bulk and breakbulk by the Nectar bulk terminal (NSBT).">港务局 SLPA 作为"房东"保留岸线与监管;集装箱由 Freetown Terminal(AGL)运营,散杂货由 Nectar 散货码头运营。</p>
       <div class="tags rv">
-        <span class="tag">SLPA · 引航 / 排序 / 收费</span>
-        <span class="tag">FTL · 集装箱 / 滚装</span>
-        <span class="tag">NSBT · 散货 / 大件</span>
+        <span class="tag" data-en="SLPA · pilotage / sequencing / fees">SLPA · 引航 / 排序 / 收费</span>
+        <span class="tag" data-en="FTL · containers / RoRo">FTL · 集装箱 / 滚装</span>
+        <span class="tag" data-en="NSBT · bulk / heavy-lift">NSBT · 散货 / 大件</span>
       </div>
     </section>
 
-    <section data-img="1" data-cap="海岸 · 阿伯丁半岛" data-idx="04 — BERTHS">
-      <div class="num">03 <span>/ 泊位与硬件</span></div>
-      <h2 class="rv">八个泊位<br>各有硬约束<span class="en">Berths &amp; draft limits</span></h2>
-      <p class="lead rv">最大船长从 140 米到 270 米不等,靠泊水深 8.5–13 米。7 号泊位与 NSBT 新泊位水深达 13 米,可靠大船。</p>
-      <p class="sub rv">⚠ 实务提醒:港池长期缺乏疏浚,4–6 号泊位曾出现"坐泥",安排深吃水船须向代理核实当期实测水深与潮汐窗口。</p>
+    <section data-img="1" data-cap="海岸 · 阿伯丁半岛" data-cap-en="Coast · Aberdeen peninsula" data-idx="04 — BERTHS">
+      <div class="num" data-en="03 <span>/ BERTHS</span>">03 <span>/ 泊位与硬件</span></div>
+      <h2 class="rv" data-en="Eight berths,<br>each with hard limits">八个泊位<br>各有硬约束<span class="en">Berths &amp; draft limits</span></h2>
+      <p class="lead rv" data-en="Max LOA ranges from 140 m to 270 m, alongside depth 8.5–13 m. Berth 7 and the new NSBT berth reach 13 m, able to take larger ships.">最大船长从 140 米到 270 米不等,靠泊水深 8.5–13 米。7 号泊位与 NSBT 新泊位水深达 13 米,可靠大船。</p>
+      <p class="sub rv" data-en="⚠ Practical note: the basin has long gone undredged; berths 4–6 have seen ships sit on the mud. For deep-draft calls, confirm current surveyed depth and tidal windows with your agent.">⚠ 实务提醒:港池长期缺乏疏浚,4–6 号泊位曾出现"坐泥",安排深吃水船须向代理核实当期实测水深与潮汐窗口。</p>
     </section>
 
-    <section data-img="4" data-cap="海岸全景 · Ghassan Mroue" data-idx="05 — CARGO">
-      <div class="num">04 <span>/ 货流结构</span></div>
-      <h2 class="rv">资源出口<br>建材民生进口<span class="en">Two-way cargo flow</span></h2>
-      <p class="lead rv">出口以铁矿石(17–20 万吨级)、铝土矿、金红石为主;进口以集装箱、水泥熟料、钢筋、粮食、油品与滚装车辆为主。</p>
+    <section data-img="4" data-cap="海岸全景 · Ghassan Mroue" data-cap-en="Coastline · Ghassan Mroue" data-idx="05 — CARGO">
+      <div class="num" data-en="04 <span>/ CARGO</span>">04 <span>/ 货流结构</span></div>
+      <h2 class="rv" data-en="Resources out,<br>materials &amp; goods in">资源出口<br>建材民生进口<span class="en">Two-way cargo flow</span></h2>
+      <p class="lead rv" data-en="Exports are led by iron ore (170–200k-tonne lots), bauxite and rutile; imports by containers, cement clinker, rebar, grain, fuel and RoRo vehicles.">出口以铁矿石(17–20 万吨级)、铝土矿、金红石为主;进口以集装箱、水泥熟料、钢筋、粮食、油品与滚装车辆为主。</p>
       <div class="tags rv">
         <span class="tag">Iron Ore</span><span class="tag">Bauxite</span><span class="tag">Rutile</span>
         <span class="tag">Containers</span><span class="tag">Cement</span><span class="tag">Rice</span>
@@ -186,27 +195,27 @@
       </div>
     </section>
 
-    <section data-img="3" data-cap="城市街景" data-idx="06 — PROCESS">
-      <div class="num">05 <span>/ 到港流程</span></div>
-      <h2 class="rv">先到先服务<br>每日靠泊会议<span class="en">Arrival &amp; berthing</span></h2>
-      <p class="lead rv">到港前 5/3/2/1 天更新 ETA;VHF 16 频道登记;靠泊与引航在周一至周五的靠泊会议确定;强制引航与拖轮,靠泊须挂塞拉利昂国旗。</p>
-      <p class="sub rv">六大口岸单证(移民 / 海关 / 卫生 / 港务 / PSC / MARPOL)建议到港前两天发代理,登陆证亦同步申请。</p>
+    <section data-img="3" data-cap="城市街景" data-cap-en="City street" data-idx="06 — PROCESS">
+      <div class="num" data-en="05 <span>/ ARRIVAL</span>">05 <span>/ 到港流程</span></div>
+      <h2 class="rv" data-en="First come, first served,<br>daily berthing meeting">先到先服务<br>每日靠泊会议<span class="en">Arrival &amp; berthing</span></h2>
+      <p class="lead rv" data-en="Update ETA at 5/3/2/1 days out; register on VHF 16; berthing and pilotage are fixed at the Mon–Fri berthing meeting; pilotage and tugs are compulsory, and the Sierra Leone flag must be flown alongside.">到港前 5/3/2/1 天更新 ETA;VHF 16 频道登记;靠泊与引航在周一至周五的靠泊会议确定;强制引航与拖轮,靠泊须挂塞拉利昂国旗。</p>
+      <p class="sub rv" data-en="The six clearance papers (immigration / customs / health / port / PSC / MARPOL) should reach the agent two days before arrival, with landing passes applied for in parallel.">六大口岸单证(移民 / 海关 / 卫生 / 港务 / PSC / MARPOL)建议到港前两天发代理,登陆证亦同步申请。</p>
     </section>
 
-    <section data-img="5" data-cap="历史 · 1905年的弗里敦" data-idx="07 — TARIFF">
-      <div class="num">06 <span>/ 收费体系</span></div>
-      <h2 class="rv">海运费按<br>总长 LOA 计<span class="en">2025 tariff · in USD</span></h2>
-      <p class="lead rv">靠泊船(&gt;100m)US$100/米,50–100m US$55/米,仅锚泊 US$20/米。引航、拖轮强制;移泊、加拖、待命超时等另计。</p>
+    <section data-img="5" data-cap="历史 · 1905年的弗里敦" data-cap-en="Historic · Freetown, 1905" data-idx="07 — TARIFF">
+      <div class="num" data-en="06 <span>/ TARIFF</span>">06 <span>/ 收费体系</span></div>
+      <h2 class="rv" data-en="Port dues charged<br>per metre of LOA">海运费按<br>总长 LOA 计<span class="en">2025 tariff · in USD</span></h2>
+      <p class="lead rv" data-en="Alongside (&gt;100 m) US$100/m, 50–100 m US$55/m, anchorage only US$20/m. Pilotage and tugs are compulsory; shifting, extra tugs and standby overtime are charged separately.">靠泊船(&gt;100m)US$100/米,50–100m US$55/米,仅锚泊 US$20/米。引航、拖轮强制;移泊、加拖、待命超时等另计。</p>
       <div class="stat rv">
-        <div><div class="v">$100</div><div class="k">/ 米 LOA(&gt;100m)</div></div>
-        <div><div class="v">$20</div><div class="k">/ 米(锚泊)</div></div>
-        <div><div class="v">50%</div><div class="k">预付押金</div></div>
+        <div><div class="v">$100</div><div class="k" data-en="/ m LOA (&gt;100m)">/ 米 LOA(&gt;100m)</div></div>
+        <div><div class="v">$20</div><div class="k" data-en="/ m (anchorage)">/ 米(锚泊)</div></div>
+        <div><div class="v">50%</div><div class="k" data-en="deposit upfront">预付押金</div></div>
       </div>
     </section>
 
     <footer>
-      <div class="big">从一个港口,<br>读懂一个国家的供应链。</div>
-      <p>本页为弗里敦港物流实务介绍的可视化版本,版式参照沉浸式作品集风格(深色 / 左图右文 / 滚动换图)。<br>
+      <div class="big" data-en="Read a nation's supply chain<br>through a single port.">从一个港口,<br>读懂一个国家的供应链。</div>
+      <p data-en="An immersive, portfolio-style visualisation of a practical logistics brief on the Port of Freetown (dark / image-left, text-right / scroll-driven imagery).<br>Images are from Wikimedia Commons, all <b>CC BY-SA</b>, downloaded and <b>self-hosted</b> (local WebP/JPG, long edge ≤1920px; originals archived in images/originals/).<br><br>Author &amp; licence credits in <a href='images/CREDITS.md'>images/CREDITS.md</a> · image list <a href='images/manifest.csv'>images/manifest.csv</a> · notes <a href='README.md'>README.md</a>">本页为弗里敦港物流实务介绍的可视化版本,版式参照沉浸式作品集风格(深色 / 左图右文 / 滚动换图)。<br>
       图片来自 Wikimedia Commons,均为 <b>CC BY-SA</b>,已下载并<b>自托管</b>(本地 WebP/JPG,长边 ≤1920px,原图存档于 images/originals/)。<br><br>
       作者与授权署名见 <a href="images/CREDITS.md">images/CREDITS.md</a> · 图片清单 <a href="images/manifest.csv">images/manifest.csv</a> · 说明 <a href="README.md">README.md</a></p>
     </footer>
@@ -223,6 +232,7 @@ const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const GS = !!(window.gsap && window.ScrollTrigger);
 const MOTION = GS && !REDUCE;                       // 是否启用强动效
 const FINE = matchMedia('(pointer:fine)').matches;  // 精确指针(非触摸)
+let LANG = 'zh';                                     // 当前语言(中/英切换)
 if(GS) gsap.registerPlugin(ScrollTrigger);
 
 // ---- image set: 本地自托管 (Wikimedia Commons · CC BY-SA)。webp 主用、jpg 兜底、grad 渐变保底。
@@ -267,8 +277,9 @@ function ensureLoaded(i){
 const layers=[...document.querySelectorAll('.media .layer')];
 const capEl=document.getElementById('cap');
 const idxEl=document.getElementById('idx');
-let front=0, currentI=-1, painted=false;
+let front=0, currentI=-1, painted=false, currentSec=null;
 if(MOTION) layers.forEach(l=>{ l.style.transition='none'; });  // 换图改由 GSAP clip 接管
+const capFor=(s)=> s ? (LANG==='en' ? (s.dataset.capEn||s.dataset.cap) : s.dataset.cap) : '';
 
 function layerBg(i){ const r=resolved[i]; return r.loaded ? `url("${r.src}")` : r.grad; }
 function paint(i){
@@ -309,7 +320,8 @@ const io=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting && e.intersectionRatio>0.5){
       const s=e.target, k=secs.indexOf(s);
-      setImage(+s.dataset.img, s.dataset.cap, s.dataset.idx);
+      currentSec=s;
+      setImage(+s.dataset.img, capFor(s), s.dataset.idx);
       if(seq[k+1]!=null) ensureLoaded(seq[k+1]); // 预载下一张
     }
   });
@@ -317,7 +329,8 @@ const io=new IntersectionObserver((entries)=>{
 secs.forEach(s=>io.observe(s));
 
 // initial
-setImage(0,'港口 · 卡拉德尼兹电力船','01 — GATEWAY');
+currentSec=secs[0];
+setImage(0, capFor(secs[0]), '01 — GATEWAY');
 
 /* ============ P1 · 动效层(Lenis + GSAP / ScrollTrigger) ============ */
 /* —— 惯性平滑滚动 Lenis,驱动接到 GSAP ticker,滚动同步 ScrollTrigger —— */
@@ -443,6 +456,50 @@ if(MOTION){
        scrollTrigger:{trigger:sec, start:'top top', end:'bottom top', scrub:0.5}});
   });
 }
+/* —— P2 · 中/英语言切换(以 data-en 为准,与拆行/包裹解耦)—— */
+(function(){
+  // 捕获原始中文:标题从已拆行的 .line-i 反推;其它元素取当前 innerHTML
+  document.querySelectorAll('h1[data-en],h2[data-en]').forEach(h=>{
+    if(h.dataset.zhRaw!=null) return;
+    const lines=[...h.querySelectorAll('.line-i')];
+    if(lines.length) h.dataset.zhRaw=lines.map(n=>n.innerHTML).join('<br>');
+    else { const c=h.cloneNode(true); const e=c.querySelector('.en'); if(e)e.remove(); h.dataset.zhRaw=c.innerHTML.trim(); }
+  });
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    if(el.matches('h1,h2')) return;
+    if(el.dataset.zh==null) el.dataset.zh=el.innerHTML;
+  });
+
+  function rebuildHeading(h, raw){
+    const kicker=h.querySelector('.en');
+    const wasSplit=!!h.querySelector('.line');
+    h.innerHTML='';
+    if(wasSplit){
+      raw.split(/<br\s*\/?>/i).map(s=>s.trim()).filter(Boolean).forEach(p=>{
+        const mask=document.createElement('span'); mask.className='line';
+        const inner=document.createElement('span'); inner.className='line-i'; inner.innerHTML=p;
+        mask.appendChild(inner); h.appendChild(mask);
+      });
+    } else { h.innerHTML=raw; }
+    if(kicker) h.appendChild(kicker);   // 保留英文 kicker(EN 模式由 CSS 隐藏)
+  }
+
+  function applyLang(lang){
+    LANG=lang;
+    document.documentElement.lang = lang==='en' ? 'en' : 'zh';
+    document.body.classList.toggle('lang-en', lang==='en');
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      if(el.matches('h1,h2')) rebuildHeading(el, lang==='en'?el.dataset.en:el.dataset.zhRaw);
+      else el.innerHTML = lang==='en'?el.dataset.en:el.dataset.zh;
+    });
+    if(currentSec) capEl.innerHTML = caption(currentI, capFor(currentSec));  // 刷新图注语言
+    const btn=document.getElementById('langtoggle'); if(btn) btn.textContent = lang==='en'?'中文':'EN';
+    if(window.ScrollTrigger) ScrollTrigger.refresh();
+  }
+  const lt=document.getElementById('langtoggle');
+  if(lt) lt.addEventListener('click', ()=>applyLang(LANG==='en'?'zh':'en'));
+})();
+
 if(GS) ScrollTrigger.refresh();
 </script>
 

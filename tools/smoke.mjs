@@ -40,6 +40,31 @@ const init = await page.evaluate(() => ({
 }));
 await page.screenshot({ path: SHOT + "/smoke-hero.png" });
 
+// i18n:切到英文
+await page.click("#langtoggle");
+await sleep(700);
+const en = await page.evaluate(() => ({
+  htmlLang: document.documentElement.lang,
+  bodyEn: document.body.classList.contains("lang-en"),
+  h1: document.querySelector("h1").textContent.replace(/\s+/g, " ").trim(),
+  lead: document.querySelector("p.lead").textContent.trim().slice(0, 18),
+  btn: document.getElementById("langtoggle").textContent.trim(),
+  h2lines: document.querySelectorAll("h2 .line").length,
+}));
+await page.screenshot({ path: SHOT + "/smoke-en.png" });
+// 切回中文
+await page.click("#langtoggle");
+await sleep(500);
+const zhBack = await page.evaluate(() => ({
+  htmlLang: document.documentElement.lang,
+  h1: document.querySelector("h1").textContent.replace(/\s+/g, " ").trim(),
+  btn: document.getElementById("langtoggle").textContent.trim(),
+}));
+const i18nOk = en.bodyEn && en.htmlLang === "en" && en.h1.includes("Port of Freetown")
+  && en.lead.startsWith("A superb") && en.btn === "中文"
+  && zhBack.htmlLang === "zh" && zhBack.h1.includes("弗里敦港") && zhBack.btn === "EN";
+const reSplitOk = process.env.REDUCED ? en.h2lines === 0 : en.h2lines > 0; // 切换后标题应按模式(全动效拆行/降级不拆)
+
 // 滚到“概况”(含 1,067m / ~10m / 6),触发 count-up
 await page.evaluate(() => window.scrollTo(0, innerHeight * 1.2));
 await sleep(2000);
@@ -79,16 +104,17 @@ console.log("stat#1 :", JSON.stringify(stat1), ok1 ? "✓" : "✗ EXPECT " + JSO
 console.log("tariff :", JSON.stringify(probe2.tariff), okT ? "✓" : "✗ EXPECT " + JSON.stringify(expectT));
 console.log("parallax bgPosY:", probe2.bgPosY, parallax ? "✓ (moved)" : "✗ (still 50%)");
 console.log("img@bottom:", probe2.img, "| progress:", probe2.progress);
+console.log("i18n   : en.h1=" + JSON.stringify(en.h1.slice(0, 40)) + " btn=" + en.btn + " back=" + zhBack.btn, i18nOk ? "✓" : "✗");
 console.log("errors :", errors.length ? "\n  - " + errors.join("\n  - ") : "none ✓");
 
 let pass;
 if (process.env.REDUCED) {
-  // 降级模式:不拆行、不注入光标、内容静态可读(.lead 不被隐藏)、数值原样、零报错
+  // 降级模式:不拆行、不注入光标、内容静态可读(.lead 不被隐藏)、数值原样、零报错;i18n 仍须可用
   const reducedOk = !init.cursorEl && init.h2lines === 0 && init.leadOpacity > 0.9;
   console.log("REDUCED: cursor=", init.cursorEl, "h2lines=", init.h2lines, "leadOpacity=", init.leadOpacity, reducedOk ? "✓" : "✗");
-  pass = !errors.length && ok1 && okT && reducedOk;
+  pass = !errors.length && ok1 && okT && reducedOk && i18nOk && reSplitOk;
 } else {
-  pass = !errors.length && ok1 && okT && init.cursorEl && init.h2lines > 0;
+  pass = !errors.length && ok1 && okT && init.cursorEl && init.h2lines > 0 && i18nOk && reSplitOk;
 }
 console.log(pass ? "\nSMOKE PASS ✓ (" + (process.env.REDUCED ? "reduced-motion" : "full-motion") + ")" : "\nSMOKE FAIL ✗");
 process.exit(pass ? 0 : 1);
