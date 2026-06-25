@@ -83,6 +83,13 @@
   .line{display:block;overflow:hidden;padding-bottom:.09em;margin-bottom:-.09em}
   .line-i{display:block;will-change:transform}
 
+  /* 自定义光标(精确指针设备,JS 注入) */
+  .cursor,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:100;mix-blend-mode:difference}
+  .cursor{width:7px;height:7px;background:#fff}
+  .cursor-ring{width:34px;height:34px;border:1px solid rgba(255,255,255,.7)}
+  body.has-cursor,body.has-cursor a,body.has-cursor .tag,body.has-cursor .media{cursor:none}
+  @media (pointer:coarse){.cursor,.cursor-ring{display:none!important}}
+
   /* 无障碍:用户要求减少动态 → 关掉惯性/视差/Ken-Burns/装饰动画,内容直接可读 */
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto}
@@ -204,6 +211,13 @@
 <script src="vendor/ScrollTrigger.min.js"></script>
 <script src="vendor/lenis.min.js"></script>
 <script>
+// ---- 动效能力探测(提到最前:paint() 初始即用)----
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const GS = !!(window.gsap && window.ScrollTrigger);
+const MOTION = GS && !REDUCE;                       // 是否启用强动效
+const FINE = matchMedia('(pointer:fine)').matches;  // 精确指针(非触摸)
+if(GS) gsap.registerPlugin(ScrollTrigger);
+
 // ---- image set: 本地自托管 (Wikimedia Commons · CC BY-SA)。webp 主用、jpg 兜底、grad 渐变保底。
 //      署名见 images/CREDITS.md。下标与右侧 section 的 data-img 一一对应。----
 const IMAGES = [
@@ -246,17 +260,28 @@ function ensureLoaded(i){
 const layers=[...document.querySelectorAll('.media .layer')];
 const capEl=document.getElementById('cap');
 const idxEl=document.getElementById('idx');
-let front=0, currentI=-1;
+let front=0, currentI=-1, painted=false;
+if(MOTION) layers.forEach(l=>{ l.style.transition='none'; });  // 换图改由 GSAP clip 接管
 
 function layerBg(i){ const r=resolved[i]; return r.loaded ? `url("${r.src}")` : r.grad; }
 function paint(i){
-  const back=layers[front^1];
+  const back=layers[front^1], fore=layers[front];
   back.style.backgroundImage=layerBg(i);
   back.dataset.idx=i;
   back.style.animation='none'; void back.offsetWidth; back.style.animation='kb 14s ease-out forwards';
-  layers[front].classList.remove('on');
-  back.classList.add('on');
-  front^=1;
+  if(MOTION && window.gsap && painted){
+    // clip-path 遮罩擦除:新图自右向左揭示,盖过旧图(比纯 opacity 更"作品感")
+    gsap.killTweensOf([back,fore]);
+    back.classList.add('on');
+    gsap.set(back,{zIndex:2, clipPath:'inset(0 0 0 100%)'});
+    gsap.set(fore,{zIndex:1});
+    gsap.to(back,{clipPath:'inset(0 0 0 0%)', duration:1.0, ease:'power3.inOut',
+      onComplete(){ fore.classList.remove('on'); gsap.set(fore,{clearProps:'clipPath,zIndex'}); }});
+  } else {
+    fore.classList.remove('on');
+    back.classList.add('on');
+  }
+  front^=1; painted=true;
 }
 function caption(i,cap){
   const im=IMAGES[i]||{};
@@ -288,11 +313,6 @@ secs.forEach(s=>io.observe(s));
 setImage(0,'港口 · 卡拉德尼兹电力船','01 — GATEWAY');
 
 /* ============ P1 · 动效层(Lenis + GSAP / ScrollTrigger) ============ */
-const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const GS = !!(window.gsap && window.ScrollTrigger);
-const MOTION = GS && !REDUCE;          // 是否启用强动效
-if(GS) gsap.registerPlugin(ScrollTrigger);
-
 /* —— 惯性平滑滚动 Lenis,驱动接到 GSAP ticker,滚动同步 ScrollTrigger —— */
 let lenis=null;
 if(MOTION && window.Lenis){
@@ -356,6 +376,52 @@ if(lenis) lenis.on('scroll', setProgress);
 addEventListener('scroll', setProgress, {passive:true});
 addEventListener('resize', ()=>{ setProgress(); if(GS) ScrollTrigger.refresh(); });
 setProgress();
+
+/* —— 左图视差:随滚动微移背景位置(不与 Ken-Burns 的 transform 冲突)—— */
+if(MOTION){
+  let bgY=50, curY=50;
+  const calc=()=>{ const h=document.documentElement;
+    const p=h.scrollTop/((h.scrollHeight-h.clientHeight)||1); bgY=50+(p-0.5)*12; };
+  gsap.ticker.add(()=>{ curY+=(bgY-curY)*0.08;
+    layers.forEach(l=>{ l.style.backgroundPositionX='center'; l.style.backgroundPositionY=curY.toFixed(2)+'%'; }); });
+  (lenis ? lenis.on('scroll',calc) : addEventListener('scroll',calc,{passive:true})); calc();
+}
+
+/* —— 自定义光标 + 关键元素磁吸(仅精确指针 + 强动效)—— */
+if(MOTION && FINE){
+  const dot=document.createElement('div'); dot.className='cursor';
+  const ring=document.createElement('div'); ring.className='cursor-ring';
+  document.body.append(dot,ring); document.body.classList.add('has-cursor');
+  gsap.set([dot,ring],{xPercent:-50, yPercent:-50});
+  const dx=gsap.quickTo(dot,'x',{duration:.12,ease:'power3'}), dy=gsap.quickTo(dot,'y',{duration:.12,ease:'power3'});
+  const rx=gsap.quickTo(ring,'x',{duration:.45,ease:'power3'}), ry=gsap.quickTo(ring,'y',{duration:.45,ease:'power3'});
+  addEventListener('mousemove',e=>{ dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); });
+  document.querySelectorAll('a, .tag, .media, .brand').forEach(el=>{
+    el.addEventListener('mouseenter',()=>gsap.to(ring,{scale:1.8,duration:.3}));
+    el.addEventListener('mouseleave',()=>gsap.to(ring,{scale:1,duration:.3}));
+  });
+  document.querySelectorAll('.tag, .brand').forEach(el=>{   // 磁吸吸附
+    el.addEventListener('mousemove',e=>{ const r=el.getBoundingClientRect();
+      gsap.to(el,{x:(e.clientX-(r.left+r.width/2))*0.35, y:(e.clientY-(r.top+r.height/2))*0.4, duration:.4, ease:'power3'}); });
+    el.addEventListener('mouseleave',()=>gsap.to(el,{x:0, y:0, duration:.5, ease:'elastic.out(1,.4)'}));
+  });
+}
+
+/* —— 数字 count-up:滚入视口时计数,保留前缀($/~)、后缀(m/%)与千分位 —— */
+if(MOTION){
+  const countUp=(el)=>{ const m=el.textContent.trim().match(/^([^\d]*)([\d,]+(?:\.\d+)?)(.*)$/); if(!m) return;
+    const pre=m[1], suf=m[3], hasComma=m[2].includes(','), numStr=m[2].replace(/,/g,'');
+    const dec=(numStr.split('.')[1]||'').length, target=parseFloat(numStr), o={v:0};
+    gsap.to(o,{v:target, duration:1.4, ease:'power2.out', onUpdate(){
+      let s = dec ? o.v.toFixed(dec) : Math.round(o.v).toString();
+      if(hasComma) s = Number(s).toLocaleString('en-US',{minimumFractionDigits:dec, maximumFractionDigits:dec});
+      el.textContent = pre+s+suf;
+    }});
+  };
+  document.querySelectorAll('.stat .v').forEach(el=>
+    ScrollTrigger.create({trigger:el, start:'top 92%', once:true, onEnter:()=>countUp(el)}));
+}
+
 if(GS) ScrollTrigger.refresh();
 </script>
 </body>
