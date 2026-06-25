@@ -12,7 +12,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const browser = await puppeteer.launch({
   executablePath: CHROME, headless: "new",
-  args: ["--no-sandbox", "--disable-gpu", "--window-size=1440,900"],
+  args: ["--no-sandbox", "--window-size=1440,900",
+    "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"],
 });
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
@@ -34,7 +35,10 @@ const init = await page.evaluate(() => ({
   cursorEl: !!document.querySelector(".cursor") && !!document.querySelector(".cursor-ring"),
   leadOpacity: parseFloat(getComputedStyle(document.querySelector("p.lead")).opacity),
   img0: getComputedStyle(document.querySelector(".media .layer.on")).backgroundImage.slice(0, 55),
+  bgfx: (() => { const c = document.getElementById("bgfx");
+    return c ? { disp: getComputedStyle(c).display, w: c.width, h: c.height } : null; })(),
 }));
+await page.screenshot({ path: SHOT + "/smoke-hero.png" });
 
 // 滚到“概况”(含 1,067m / ~10m / 6),触发 count-up
 await page.evaluate(() => window.scrollTo(0, innerHeight * 1.2));
