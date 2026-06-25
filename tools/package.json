@@ -7,6 +7,7 @@
     "optimize": "node optimize-images.mjs"
   },
   "dependencies": {
+    "puppeteer-core": "^23.11.1",
     "sharp": "^0.33.5"
   }
 }

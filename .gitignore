@@ -9,3 +9,6 @@ assets/photos/freetown_web/images/originals/
 .DS_Store
 Thumbs.db
 *.log
+
+# 冒烟测试截图(临时)
+assets/photos/freetown_web/_smoke.png
