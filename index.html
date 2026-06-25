@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FREETOWN — Port of Sierra Leone</title>
+<meta name="description" content="弗里敦港(伊丽莎白二世码头)物流实务介绍 · 塞拉利昂唯一深水港 · 沉浸式可视化">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0d10'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='18' fill='%235aa9e6' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <style>
   :root{
     --bg:#0b0d10; --bg2:#0f1318; --ink:#f4f1ea; --muted:#8b9098;
@@ -76,6 +78,19 @@
   /* reveal */
   .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
   .rv.in{opacity:1;transform:none}
+
+  /* kinetic title: per-line mask (JS 把 h1/h2 按 <br> 拆行后套用) */
+  .line{display:block;overflow:hidden;padding-bottom:.09em;margin-bottom:-.09em}
+  .line-i{display:block;will-change:transform}
+
+  /* 无障碍:用户要求减少动态 → 关掉惯性/视差/Ken-Burns/装饰动画,内容直接可读 */
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .media .layer{animation:none!important;transform:none!important}
+    .scrollhint .bar::after{animation:none!important}
+    .rv{opacity:1;transform:none;transition:none}
+    .line-i{transform:none!important}
+  }
 
   footer{background:#05080c;padding:80px 8vw;color:var(--muted);font-size:13px;line-height:1.9}
   footer a{color:var(--accent)}
@@ -184,6 +199,10 @@
   </div>
 </div>
 
+<!-- 动效库:本地 vendored(无构建、离线可用)。顺序 gsap → ScrollTrigger → lenis → 页面脚本 -->
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
 <script>
 // ---- image set: 本地自托管 (Wikimedia Commons · CC BY-SA)。webp 主用、jpg 兜底、grad 渐变保底。
 //      署名见 images/CREDITS.md。下标与右侧 section 的 data-img 一一对应。----
@@ -268,19 +287,76 @@ secs.forEach(s=>io.observe(s));
 // initial
 setImage(0,'港口 · 卡拉德尼兹电力船','01 — GATEWAY');
 
-// reveal on scroll
-const rio=new IntersectionObserver((es)=>{
-  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); rio.unobserve(e.target);} });
-},{threshold:.2});
-document.querySelectorAll('.rv').forEach(el=>rio.observe(el));
+/* ============ P1 · 动效层(Lenis + GSAP / ScrollTrigger) ============ */
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const GS = !!(window.gsap && window.ScrollTrigger);
+const MOTION = GS && !REDUCE;          // 是否启用强动效
+if(GS) gsap.registerPlugin(ScrollTrigger);
 
-// progress bar
+/* —— 惯性平滑滚动 Lenis,驱动接到 GSAP ticker,滚动同步 ScrollTrigger —— */
+let lenis=null;
+if(MOTION && window.Lenis){
+  lenis=new Lenis({ duration:1.1, smoothWheel:true,
+    easing:t=>Math.min(1, 1.001 - Math.pow(2, -10*t)) });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t=>lenis.raf(t*1000));   // gsap 秒 → lenis 毫秒
+  gsap.ticker.lagSmoothing(0);
+  document.documentElement.style.scrollBehavior='auto';
+}
+
+/* —— 标题逐行揭示:按 <br> 拆行 → 每行套遮罩 → 自下而上揭示 —— */
+function splitLines(h){
+  const en=h.querySelector('.en'); if(en) en.remove();
+  const parts=h.innerHTML.split(/<br\s*\/?>/i).map(s=>s.trim()).filter(Boolean);
+  h.innerHTML='';
+  const inners=parts.map(p=>{
+    const mask=document.createElement('span'); mask.className='line';
+    const inner=document.createElement('span'); inner.className='line-i'; inner.innerHTML=p;
+    mask.appendChild(inner); h.appendChild(mask); return inner;
+  });
+  if(en) h.appendChild(en);
+  return {inners,en};
+}
+if(MOTION){
+  document.querySelectorAll('h1,h2').forEach(h=>{
+    const {inners,en}=splitLines(h);
+    gsap.set(inners,{yPercent:118});
+    const tl=gsap.timeline({scrollTrigger:{trigger:h, start:'top 86%'}});
+    tl.to(inners,{yPercent:0, duration:1.0, ease:'expo.out', stagger:0.1});
+    if(en) tl.from(en,{opacity:0, y:12, duration:.7, ease:'power2.out'}, '-=.5');
+  });
+}
+
+/* —— 段落 / 数字 / tag 错落入场(MOTION:GSAP stagger;否则:IO 兜底)—— */
+if(MOTION){
+  const items=[...document.querySelectorAll('.rv:not(h2)')];   // h2 由逐行揭示接管
+  gsap.set(items,{opacity:0, y:30});
+  items.forEach(el=>{ el.style.transition='none';              // 避免与 CSS 过渡打架
+    const kids = el.matches('.stat,.tags') ? [...el.children] : null;
+    ScrollTrigger.create({ trigger:el, start:'top 88%', once:true, onEnter(){
+      gsap.to(el,{opacity:1, y:0, duration:.9, ease:'power3.out'});
+      if(kids) gsap.from(kids,{opacity:0, y:18, duration:.7, ease:'power3.out', stagger:.08, delay:.05});
+    }});
+  });
+} else {
+  const rio=new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); rio.unobserve(e.target);} });
+  },{threshold:.2});
+  document.querySelectorAll('.rv').forEach(el=>rio.observe(el));
+}
+
+/* —— 顶部进度条 —— */
 const prog=document.getElementById('progress');
-addEventListener('scroll',()=>{
+function setProgress(){
   const h=document.documentElement;
-  const p=h.scrollTop/(h.scrollHeight-h.clientHeight);
-  prog.style.width=(p*100)+'%';
-},{passive:true});
+  const p=h.scrollTop/((h.scrollHeight-h.clientHeight)||1);
+  prog.style.width=(Math.min(1,Math.max(0,p))*100)+'%';
+}
+if(lenis) lenis.on('scroll', setProgress);
+addEventListener('scroll', setProgress, {passive:true});
+addEventListener('resize', ()=>{ setProgress(); if(GS) ScrollTrigger.refresh(); });
+setProgress();
+if(GS) ScrollTrigger.refresh();
 </script>
 </body>
 </html>
