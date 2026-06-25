@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FREETOWN — Port of Sierra Leone</title>
+<style>
+  :root{
+    --bg:#0b0d10; --bg2:#0f1318; --ink:#f4f1ea; --muted:#8b9098;
+    --accent:#5aa9e6; --accent2:#7bd0c1; --line:rgba(255,255,255,.10);
+    --serif:"Times New Roman",Georgia,"Songti SC",serif;
+    --sans:-apple-system,"Helvetica Neue","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--accent);color:#04121f}
+
+  /* top progress + nav */
+  .progress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));z-index:90}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;justify-content:space-between;
+    align-items:center;padding:22px 34px;mix-blend-mode:difference}
+  .brand{font-weight:700;letter-spacing:.28em;font-size:13px}
+  .brand small{display:block;letter-spacing:.18em;color:var(--muted);font-weight:400;font-size:10px;margin-top:3px;mix-blend-mode:normal}
+  .meta{font-size:11px;letter-spacing:.18em;color:var(--muted);text-align:right}
+
+  /* split layout */
+  .stage{display:grid;grid-template-columns:50% 50%}
+  .media{position:sticky;top:0;height:100vh;overflow:hidden;
+    background:linear-gradient(135deg,#0a1a2b,#123a4d 55%,#1d5566)}
+  .media .layer{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease;background-size:cover;background-position:center;
+    transform:scale(1.06);animation:kb 14s ease-out forwards}
+  .media .layer.on{opacity:1}
+  @keyframes kb{from{transform:scale(1.12)}to{transform:scale(1.02)}}
+  /* duotone / cinematic grade */
+  .media::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(8,12,18,.55) 0%,rgba(8,12,18,.05) 30%,rgba(8,12,18,.35) 78%,rgba(8,12,18,.92) 100%),
+               radial-gradient(120% 80% at 80% 10%,rgba(90,169,230,.18),transparent 60%);
+    mix-blend-mode:multiply}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  /* caption on media */
+  .cap{position:absolute;left:34px;bottom:30px;z-index:5;font-size:11px;letter-spacing:.16em;color:var(--muted)}
+  .cap b{color:var(--ink);font-weight:600}
+  .idx{position:absolute;right:34px;top:50%;transform:translateY(-50%);z-index:5;
+    writing-mode:vertical-rl;font-size:11px;letter-spacing:.4em;color:var(--muted)}
+
+  /* content column */
+  .content{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+  section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:120px 8vw 120px;border-bottom:1px solid var(--line);position:relative}
+  .num{font-family:var(--serif);font-size:13px;letter-spacing:.3em;color:var(--accent);margin-bottom:26px}
+  .num span{color:var(--muted)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6vw,82px);line-height:.98;margin-bottom:8px}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.6vw,52px);line-height:1.02;margin-bottom:20px}
+  .en{display:block;color:var(--muted);font-size:.34em;letter-spacing:.22em;text-transform:uppercase;margin-top:18px;font-family:var(--sans)}
+  p.lead{font-size:17px;line-height:1.85;color:#d7d3ca;max-width:46ch;margin-top:6px}
+  p.sub{font-size:14px;line-height:1.9;color:var(--muted);max-width:48ch;margin-top:18px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:30px}
+  .tag{font-size:11px;letter-spacing:.12em;color:var(--ink);border:1px solid var(--line);
+    border-radius:40px;padding:7px 14px;background:rgba(255,255,255,.02)}
+  .stat{display:flex;gap:42px;margin-top:38px;flex-wrap:wrap}
+  .stat div{min-width:90px}
+  .stat .v{font-family:var(--serif);font-size:34px;color:var(--accent2)}
+  .stat .k{font-size:11px;letter-spacing:.14em;color:var(--muted);margin-top:4px}
+
+  /* hero (first section spans full + overlaps media) */
+  .hero{justify-content:flex-end;padding-bottom:9vh}
+  .hero h1{font-size:clamp(56px,8.5vw,120px)}
+  .scrollhint{position:absolute;bottom:30px;left:8vw;font-size:11px;letter-spacing:.24em;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .scrollhint .bar{width:34px;height:1px;background:var(--muted);position:relative;overflow:hidden}
+  .scrollhint .bar::after{content:"";position:absolute;left:-34px;top:0;width:34px;height:1px;background:var(--accent);animation:slide 2s infinite}
+  @keyframes slide{to{left:34px}}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
+  .rv.in{opacity:1;transform:none}
+
+  footer{background:#05080c;padding:80px 8vw;color:var(--muted);font-size:13px;line-height:1.9}
+  footer a{color:var(--accent)}
+  footer .big{font-family:var(--serif);font-size:clamp(28px,4vw,52px);color:var(--ink);margin-bottom:28px;line-height:1.05}
+
+  @media(max-width:860px){
+    .stage{grid-template-columns:1fr}
+    .media{height:62vh;position:sticky;top:0}
+    .content{position:relative;z-index:2;background:var(--bg)}
+    section{min-height:auto;padding:90px 28px}
+    .idx{display:none}
+    .scrollhint{left:28px}
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="topbar">
+  <div class="brand">FREETOWN<small>QUEEN ELIZABETH II QUAY · SIERRA LEONE</small></div>
+  <div class="meta">8°29′N&nbsp;&nbsp;13°12′W<br>UN/LOCODE · SLFNA</div>
+</div>
+
+<div class="stage">
+  <!-- LEFT: media stage -->
+  <div class="media" id="media">
+    <div class="layer on" data-i="0" style="background-image:linear-gradient(135deg,#0a1a2b,#123a4d 55%,#1d5566)"></div>
+    <div class="layer" data-i="1"></div>
+    <div class="grain"></div>
+    <div class="idx" id="idx">01 — FREETOWN</div>
+    <div class="cap" id="cap"><b>港口 · 卡拉德尼兹电力船</b>　Wikimedia Commons</div>
+  </div>
+
+  <!-- RIGHT: scrolling content -->
+  <div class="content">
+    <section class="hero" data-img="0" data-cap="港口 · 入港航道" data-idx="01 — GATEWAY">
+      <div class="num">塞拉利昂 · 国家门户</div>
+      <h1>弗里敦港<span class="en">The Port of Freetown</span></h1>
+      <p class="lead rv">西非海岸条件极佳的天然深水湾,塞拉利昂唯一的深水港——几乎承载着全国全部的进出口货流。</p>
+      <div class="scrollhint">SCROLL <span class="bar"></span></div>
+    </section>
+
+    <section data-img="0" data-cap="港口 · 卡拉德尼兹电力船" data-idx="02 — HARBOUR">
+      <div class="num">01 <span>/ 概况</span></div>
+      <h2 class="rv">一国一港的<br>海上总门户<span class="en">A natural deep-water harbour</span></h2>
+      <p class="lead rv">核心区为伊丽莎白二世码头(QE II),岸线总长约 1,067 米,1960 年由英国女王剪彩启用。它的拥堵、潮汐窗口与清关效率,直接决定整个国家供应链的节奏。</p>
+      <div class="stat rv">
+        <div><div class="v">1,067m</div><div class="k">岸线总长</div></div>
+        <div><div class="v">~10m</div><div class="k">高潮水深</div></div>
+        <div><div class="v">6</div><div class="k">同时作业船数</div></div>
+      </div>
+    </section>
+
+    <section data-img="2" data-cap="城市俯瞰 · Fourah Bay 方向" data-idx="03 — LANDLORD">
+      <div class="num">02 <span>/ 管理体制</span></div>
+      <h2 class="rv">"房东港"模式<br>三方各管一段<span class="en">Landlord port model</span></h2>
+      <p class="lead rv">港务局 SLPA 作为"房东"保留岸线与监管;集装箱由 Freetown Terminal(AGL)运营,散杂货由 Nectar 散货码头运营。</p>
+      <div class="tags rv">
+        <span class="tag">SLPA · 引航 / 排序 / 收费</span>
+        <span class="tag">FTL · 集装箱 / 滚装</span>
+        <span class="tag">NSBT · 散货 / 大件</span>
+      </div>
+    </section>
+
+    <section data-img="1" data-cap="海岸 · 阿伯丁半岛" data-idx="04 — BERTHS">
+      <div class="num">03 <span>/ 泊位与硬件</span></div>
+      <h2 class="rv">八个泊位<br>各有硬约束<span class="en">Berths &amp; draft limits</span></h2>
+      <p class="lead rv">最大船长从 140 米到 270 米不等,靠泊水深 8.5–13 米。7 号泊位与 NSBT 新泊位水深达 13 米,可靠大船。</p>
+      <p class="sub rv">⚠ 实务提醒:港池长期缺乏疏浚,4–6 号泊位曾出现"坐泥",安排深吃水船须向代理核实当期实测水深与潮汐窗口。</p>
+    </section>
+
+    <section data-img="4" data-cap="海岸全景 · Ghassan Mroue" data-idx="05 — CARGO">
+      <div class="num">04 <span>/ 货流结构</span></div>
+      <h2 class="rv">资源出口<br>建材民生进口<span class="en">Two-way cargo flow</span></h2>
+      <p class="lead rv">出口以铁矿石(17–20 万吨级)、铝土矿、金红石为主;进口以集装箱、水泥熟料、钢筋、粮食、油品与滚装车辆为主。</p>
+      <div class="tags rv">
+        <span class="tag">Iron Ore</span><span class="tag">Bauxite</span><span class="tag">Rutile</span>
+        <span class="tag">Containers</span><span class="tag">Cement</span><span class="tag">Rice</span>
+        <span class="tag">Fuel / Gasoil</span><span class="tag">RoRo</span>
+      </div>
+    </section>
+
+    <section data-img="3" data-cap="城市街景" data-idx="06 — PROCESS">
+      <div class="num">05 <span>/ 到港流程</span></div>
+      <h2 class="rv">先到先服务<br>每日靠泊会议<span class="en">Arrival &amp; berthing</span></h2>
+      <p class="lead rv">到港前 5/3/2/1 天更新 ETA;VHF 16 频道登记;靠泊与引航在周一至周五的靠泊会议确定;强制引航与拖轮,靠泊须挂塞拉利昂国旗。</p>
+      <p class="sub rv">六大口岸单证(移民 / 海关 / 卫生 / 港务 / PSC / MARPOL)建议到港前两天发代理,登陆证亦同步申请。</p>
+    </section>
+
+    <section data-img="5" data-cap="历史 · 1905年的弗里敦" data-idx="07 — TARIFF">
+      <div class="num">06 <span>/ 收费体系</span></div>
+      <h2 class="rv">海运费按<br>总长 LOA 计<span class="en">2025 tariff · in USD</span></h2>
+      <p class="lead rv">靠泊船(&gt;100m)US$100/米,50–100m US$55/米,仅锚泊 US$20/米。引航、拖轮强制;移泊、加拖、待命超时等另计。</p>
+      <div class="stat rv">
+        <div><div class="v">$100</div><div class="k">/ 米 LOA(&gt;100m)</div></div>
+        <div><div class="v">$20</div><div class="k">/ 米(锚泊)</div></div>
+        <div><div class="v">50%</div><div class="k">预付押金</div></div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="big">从一个港口,<br>读懂一个国家的供应链。</div>
+      <p>本页为弗里敦港物流实务介绍的可视化版本,版式参照沉浸式作品集风格(深色 / 左图右文 / 滚动换图)。<br>
+      图片来自 Wikimedia Commons(自由版权),由浏览器实时加载;商用发布请前往各文件页核对授权并按要求署名,建议下载后自托管。<br><br>
+      图片清单见 <a href="images/manifest.csv">images/manifest.csv</a> · 授权与使用说明见 <a href="README.md">README.md</a></p>
+    </footer>
+  </div>
+</div>
+
+<script>
+// ---- image set: edit freely. Each has a remote url + a cinematic gradient fallback ----
+const IMAGES = [
+  {url:"https://upload.wikimedia.org/wikipedia/commons/6/62/MV_Karadeniz_Powership_Do%C4%9Fan_Bey%2C_Freetown%2C_Sierra_Leone.jpg",
+   grad:"linear-gradient(135deg,#0a1a2b,#123a4d 55%,#1d5566)"},
+  {url:"https://upload.wikimedia.org/wikipedia/commons/b/b5/Aberdeen%2C_Freetown%2C_Sierra_Leone_-_panoramio.jpg",
+   grad:"linear-gradient(135deg,#0b1d24,#16424a 55%,#2a6f63)"},
+  {url:"https://upload.wikimedia.org/wikipedia/commons/f/f5/Freetown%2C_Sierra_Leone_%28West_Africa%29_from_an_apartment_near_Fourah_Bay_College_%282536946628%29.jpg",
+   grad:"linear-gradient(135deg,#101a2a,#274060 60%,#3a5e86)"},
+  {url:"https://upload.wikimedia.org/wikipedia/commons/0/08/Freetown_06_10_%2812%29_%284723659115%29.jpg",
+   grad:"linear-gradient(135deg,#1a1410,#3a2c1d 55%,#5e4632)"},
+  {url:"https://upload.wikimedia.org/wikipedia/commons/5/58/Untitled_-_panoramio_-_Ghassan_Mroue_%281%29.jpg",
+   grad:"linear-gradient(135deg,#0b1f1c,#15433b 55%,#266b54)"},
+  {url:"https://upload.wikimedia.org/wikipedia/commons/d/d2/Freetown%2C_Sierra_Leone_%28West_Africa%29%2C_c._1905_%287720917558%29.jpg",
+   grad:"linear-gradient(135deg,#15140f,#332f24 60%,#534a36)"},
+];
+
+// preload with graceful fallback to gradient
+const resolved = IMAGES.map(im=>({...im, css:im.grad}));
+IMAGES.forEach((im,i)=>{
+  const img=new Image();
+  img.onload=()=>{ resolved[i].css=`url("${im.url}")`; if(currentI===i) paint(i); };
+  img.onerror=()=>{ resolved[i].css=im.grad; };
+  img.src=im.url;
+});
+
+const layers=[...document.querySelectorAll('.media .layer')];
+const capEl=document.getElementById('cap');
+const idxEl=document.getElementById('idx');
+let front=0, currentI=-1;
+
+function paint(i){
+  const back=layers[front^1];
+  back.style.backgroundImage=resolved[i].css;
+  back.style.animation='none'; void back.offsetWidth; back.style.animation='kb 14s ease-out forwards';
+  layers[front].classList.remove('on');
+  back.classList.add('on');
+  front^=1;
+}
+function setImage(i,cap,idx){
+  if(i===currentI) return;
+  currentI=i; paint(i);
+  if(cap) capEl.innerHTML=`<b>${cap}</b>　Wikimedia Commons`;
+  if(idx) idxEl.textContent=idx;
+}
+
+// observe sections to drive the left media
+const secs=[...document.querySelectorAll('section')];
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting && e.intersectionRatio>0.5){
+      const s=e.target;
+      setImage(+s.dataset.img, s.dataset.cap, s.dataset.idx);
+    }
+  });
+},{threshold:[0.5]});
+secs.forEach(s=>io.observe(s));
+
+// initial
+setImage(0,'港口 · 卡拉德尼兹电力船','01 — GATEWAY');
+
+// reveal on scroll
+const rio=new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); rio.unobserve(e.target);} });
+},{threshold:.2});
+document.querySelectorAll('.rv').forEach(el=>rio.observe(el));
+
+// progress bar
+const prog=document.getElementById('progress');
+addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const p=h.scrollTop/(h.scrollHeight-h.clientHeight);
+  prog.style.width=(p*100)+'%';
+},{passive:true});
+</script>
+</body>
+</html>

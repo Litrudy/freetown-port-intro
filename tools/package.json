@@ -1,0 +1,12 @@
+{
+  "name": "freetown-image-tools",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only image optimization for the Freetown port page (not part of the deployable site).",
+  "scripts": {
+    "optimize": "node optimize-images.mjs"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  }
+}
